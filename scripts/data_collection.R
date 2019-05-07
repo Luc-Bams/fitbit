@@ -20,12 +20,12 @@
 ##
 ## Set working directory
 ##
-setwd("~/R/Projects/fitbit-data/")    # Luc's working directory (private)
+setwd("~/R/Projects/fitbit/")    # Luc's working directory (private)
 ##
 ##-----------------------------------------------------------------------------------------------------------------------------------------------------------------------##
 
 ##### start: MAKE DATA RETRIEVAL FUNCTIONS AVAILABLE ######################################################################################################################
-source('~/R/Projects/fitbit-data/scripts/data_collection_functions.R', encoding = 'UTF-8')
+source('~/R/Projects/fitbit/scripts/data_collection_functions.R', encoding = 'UTF-8')
 ##### end:   MAKE DATA RETRIEVAL FUNCTIONS AVAILABLE ######################################################################################################################
 
 ##### start: LOAD PACKAGES ################################################################################################################################################

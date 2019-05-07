@@ -20,7 +20,7 @@
 ##
 ## Set working directory
 ##
-setwd("~/R/Projects/fitbit-data/")    # Luc's working directory (private)
+setwd("~/R/Projects/fitbit/")    # Luc's working directory (private)
 ##
 ##-----------------------------------------------------------------------------------------------------------------------------------------------------------------------##
 
