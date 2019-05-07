@@ -38,3 +38,6 @@ rsconnect/
 
 # Anything under packrat/lib*/ doesn't need to be committed to your git-repo
 packrat/lib*/
+
+# Making sure my environment file is not uploaded
+.env
