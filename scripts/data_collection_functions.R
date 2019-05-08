@@ -49,7 +49,7 @@ check_state <- function(token = NULL) {
 #content(state)$active                                                    # TRUE when token is active
 
 ##----- start: ACTIVITY --------------------------------------------------------------------------------------------------------------------------------------------------##
-##....... Retrieves the raw "list-of-lists"-type activity data for the specified date ....................................................................................##
+##....... Retrieves the raw "list-of-lists"-type time-series activity data for the specified date ........................................................................##
 ##......... Available values : calories, caloriesBMR, steps, distance, floors, elevation, minutesSedentary, minutesLightlyActive, minutesFairlyActive, minutesVeryActive,
 ##......... activityCalories
 get_activity_raw <- function(date = NULL,
@@ -244,6 +244,19 @@ get_activity <- function(date = NULL, activity = NULL) {
   }
   
   return(df)
+}
+
+##....... Retrieves the raw summary and list of a user’s activities and activity log entries for a given day .............................................................##
+get_daily_activity_summary_raw <- function(date = NULL,
+                       token = Sys.getenv("FITB_AUTH")) {
+  GET(url = paste0("https://api.fitbit.com/1/user/-/activities/date/",
+                   date, ".json"),
+      add_headers(Authorization = paste0("Bearer ", token)))
+}
+
+get_lifetime_stats_raw <- function(token = Sys.getenv("FITB_AUTH")) {
+  GET(url = paste0("https://api.fitbit.com/1/user/-/activities.json"),
+      add_headers(Authorization = paste0("Bearer ", token)))
 }
 ##----- end:   ACTIVITY --------------------------------------------------------------------------------------------------------------------------------------------------##
 
