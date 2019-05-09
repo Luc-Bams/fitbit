@@ -10,7 +10,6 @@ output:
     gallery: false
     highlight: tango
 ---
-Attempt 2
 \*insert introductory section here\*  
 \*make sure to come up with better titles for everything\*
 
