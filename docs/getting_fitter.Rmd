@@ -2,8 +2,9 @@
 title: "Getting fitter"
 author: "Luc Bams"
 data: "May 9, 2019"
-output: html_notebook
-  theme: readthedown
+output: 
+  html_notebook:
+    theme: cosmo
 ---
 
 \*insert introductory section here\*
