@@ -2,7 +2,13 @@
 title: "Getting fitter"
 author: "Luc Bams"
 data: "May 9, 2019"
-output: rmdformats::readthedown
+output:
+  rmdformats::readthedown:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
 ---
 
 \*insert introductory section here\*

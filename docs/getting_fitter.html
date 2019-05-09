@@ -86,7 +86,22 @@ $(document).ready(function () {
 
 <script>
 $(document).ready(function () {
- 	  });
+ 	 	$('#content img')
+ 	  .addClass("image-thumb");
+      $('#content img')
+ 	  .addClass("image-lb");
+  $('#content').magnificPopup({
+	      type:'image',
+	      closeOnContentClick: false,
+	      closeBtnInside: false,
+	      delegate: 'img',
+	      gallery: {enabled: false },
+	      image: {
+	        verticalFit: true,
+          titleSrc: 'alt'
+	      }
+ 	    });
+ 	});
 </script>
 
 
