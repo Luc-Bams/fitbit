@@ -12,6 +12,7 @@ output:
     number_sections: true
 ---
 ```{r include=FALSE}
+# Make sure the most recent data is loaded
 source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 ```
 
@@ -24,8 +25,17 @@ source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 ## Activity
 \*describe activity data here\*
 
+### Steps
+```{r}
+head(act_data$steps)
+```
+
 ## Heart-Rate
 \*describe heart-rate data here\*
+```{r}
+head(hr_intraday)
+```
+
 ```{r}
 hr_intraday %>%  
   summarise(
