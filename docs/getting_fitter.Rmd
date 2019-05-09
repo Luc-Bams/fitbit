@@ -11,11 +11,18 @@ output:
     highlight: tango
     number_sections: true
 ---
+```{r include=FALSE}
+source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
+```
+
 \*insert introductory section here\*  
 \*make sure to come up with better titles for everything\*  
 
 # Data
 \*describe how the data were collected, stored, and what they look like\*
+```{r}
+sum(act_data$steps$steps)
+```
 
 # How does getting fitter reflect in the data?  
 \*obviously do a solid attempt to answer this question here\*  
