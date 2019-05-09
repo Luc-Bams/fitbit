@@ -41,3 +41,6 @@ packrat/lib*/
 
 # Making sure my environment file is not uploaded
 .env
+
+# No need for a README.html
+README.html
