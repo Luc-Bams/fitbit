@@ -1,0 +1,13 @@
+---
+title: "Getting fitter"
+output: html_notebook
+---
+
+\*insert introductory section here\*
+\*make sure to come up with better titles for everything\*
+
+# Data
+\*describe how the data were collected, stored, and what they look like\*
+
+# How does getting fitter reflect in the data?
+\*obviously do a solid attempt to answer this question here\*
