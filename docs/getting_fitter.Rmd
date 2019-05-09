@@ -20,9 +20,26 @@ source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 
 # Data
 \*describe how the data were collected, stored, and what they look like\*
+
+## Activity
+\*describe activity data here\*
+
+## Heart-Rate
+\*describe heart-rate data here\*
 ```{r}
-sum(act_data$steps$steps)
+hr_intraday %>%  
+  summarise(
+    total = sum(hr),
+    minimum = min(hr),
+    mean = mean(hr),
+    median = median(hr),
+    maximum = max(hr)
+  ) %>% 
+  knitr::kable(digits = 2, caption = "Summary of heart-rate data")
 ```
+
+## Weight
+\*describe weight data here\*
 
 # How does getting fitter reflect in the data?  
 \*obviously do a solid attempt to answer this question here\*  

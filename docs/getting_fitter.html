@@ -96,7 +96,11 @@ $(document).ready(function () {
     <h2><a href="#content">Getting fitter</a></h2>
     <div id="text-table-of-contents">
       <ul>
-      <li><a href="#data"><span class="toc-section-number">1</span> Data</a></li>
+      <li><a href="#data"><span class="toc-section-number">1</span> Data</a><ul>
+      <li><a href="#activity"><span class="toc-section-number">1.1</span> Activity</a></li>
+      <li><a href="#heart-rate"><span class="toc-section-number">1.2</span> Heart-Rate</a></li>
+      <li><a href="#weight"><span class="toc-section-number">1.3</span> Weight</a></li>
+      </ul></li>
       <li><a href="#how-does-getting-fitter-reflect-in-the-data"><span class="toc-section-number">2</span> How does getting fitter reflect in the data?</a><ul>
       <li><a href="#weekly-heart-rate-distribution"><span class="toc-section-number">2.1</span> Weekly heart-rate distribution</a></li>
       <li><a href="#link-stepsminute-to-bpm"><span class="toc-section-number">2.2</span> Link steps/minute to bpm</a></li>
@@ -111,8 +115,48 @@ $(document).ready(function () {
 <div id="data" class="section level1">
 <h1><span class="header-section-number">1</span> Data</h1>
 <p>*describe how the data were collected, stored, and what they look like*</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(act_data<span class="op">$</span>steps<span class="op">$</span>steps)</code></pre></div>
-<pre><code>## [1] 2099920</code></pre>
+<div id="activity" class="section level2">
+<h2><span class="header-section-number">1.1</span> Activity</h2>
+<p>*describe activity data here*</p>
+</div>
+<div id="heart-rate" class="section level2">
+<h2><span class="header-section-number">1.2</span> Heart-Rate</h2>
+<p>*describe heart-rate data here*</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hr_intraday <span class="op">%&gt;%</span><span class="st">  </span>
+<span class="st">  </span><span class="kw">summarise</span>(
+    <span class="dt">total =</span> <span class="kw">sum</span>(hr),
+    <span class="dt">minimum =</span> <span class="kw">min</span>(hr),
+    <span class="dt">mean =</span> <span class="kw">mean</span>(hr),
+    <span class="dt">median =</span> <span class="kw">median</span>(hr),
+    <span class="dt">maximum =</span> <span class="kw">max</span>(hr)
+  ) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="dt">digits =</span> <span class="dv">2</span>, <span class="dt">caption =</span> <span class="st">&quot;Summary of heart-rate data&quot;</span>)</code></pre></div>
+<table>
+<caption>Summary of heart-rate data</caption>
+<thead>
+<tr class="header">
+<th align="right">total</th>
+<th align="right">minimum</th>
+<th align="right">mean</th>
+<th align="right">median</th>
+<th align="right">maximum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">76171868</td>
+<td align="right">35</td>
+<td align="right">65.04</td>
+<td align="right">60</td>
+<td align="right">194</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="weight" class="section level2">
+<h2><span class="header-section-number">1.3</span> Weight</h2>
+<p>*describe weight data here*</p>
+</div>
 </div>
 <div id="how-does-getting-fitter-reflect-in-the-data" class="section level1">
 <h1><span class="header-section-number">2</span> How does getting fitter reflect in the data?</h1>
