@@ -8,7 +8,7 @@ output:
     thumbnails: true
     lightbox: true
     gallery: false
-    highlight: tango
+    highlight: espresso
     number_sections: true
 ---
 ```{r include=FALSE}
@@ -39,7 +39,6 @@ head(hr_intraday)
 ```{r}
 hr_intraday %>%  
   summarise(
-    total = sum(hr),
     minimum = min(hr),
     mean = mean(hr),
     median = median(hr),
@@ -53,6 +52,34 @@ hr_intraday %>%
 
 # How does getting fitter reflect in the data?  
 \*obviously do a solid attempt to answer this question here\*  
+
+## Rest Heart Rate
+```{r message=FALSE}
+hr_summary %>%
+  ggplot(aes(x = date, y = rest_hr)) +
+  geom_point() +
+  geom_smooth(se = FALSE, span = 0.275) +
+  labs(title = "Rest Heart Rate over Time",
+       subtitle = "*this is how you make a subtitle, Luc*",
+       caption = "*this is how you make a caption, Luc*")
+```
+
+```{r}
+hr_intraday %>%  
+  group_by(week) %>%
+  summarise(
+    minimum = min(hr),
+    mean = mean(hr),
+    median = median(hr),
+    maximum = max(hr)
+  ) %>% 
+  gather(key = "type", value = "value", -week) %>%
+  ggplot(aes(x = week, y = value)) +
+  geom_point() +
+  geom_line() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ type, nrow = 2, ncol = 2, scales = "free_y")
+```
 
 ## Weekly heart-rate distribution  
 \*show ggridges weekly heart rate distributions here\*  
