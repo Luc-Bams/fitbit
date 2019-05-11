@@ -1,6 +1,9 @@
 ---
 title: "Getting fitter"
-author: "Luc Bams"
+author: 
+  - name: "Luc Bams"
+    email: "luc-bams@hotmail.com"
+    url: "https://github.com/Luc-Bams"
 data: "May 9, 2019"
 output:
   rmdformats::readthedown:
@@ -11,7 +14,7 @@ output:
     highlight: espresso
     number_sections: true
 ---
-```{r include=FALSE}
+```{r include = FALSE}
 # Make sure the most recent data is loaded
 source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 ```
@@ -25,10 +28,85 @@ source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 ## Activity
 \*describe activity data here\*
 
-### Steps
+### Basics
 ```{r}
 head(act_data$steps)
 ```
+
+```{r include = FALSE}
+data <- list()
+for(type in c("calories", "distance", "elevation", "floors", "steps")) {
+  data[[type]] <- act_data[[type]] %>% 
+    select_(.dots = list("datetime", type, "day", "week")) %>%
+    mutate(type = type) %>%
+    rename(value = !!type) %>%
+    select(datetime, type, value, day, week)
+  data[[type]]$value <- as.double(data[[type]]$value)
+}
+
+act_tidy <- rbind(data$calories, data$distance, data$elevation, data$floors, data$steps)
+act_tidy$day <- factor(act_tidy$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+
+remove(data)
+```
+
+
+#### Minute-level
+```{r}
+act_tidy %>% 
+  filter(!is.na(act_tidy$datetime)) %>%
+  group_by(type) %>%
+  summarise(
+    total = sum(value),
+    minimum = min(value),
+    mean = mean(value),
+    median = median(value),
+    maximum = max(value)
+  ) %>% 
+  knitr::kable(digits = 2, caption = "Summary of activity data")
+```
+
+#### Daily-level
+```{r}
+act_tidy %>% 
+  filter(!is.na(act_tidy$datetime)) %>%
+  group_by(as.Date(datetime, tz = "Europe/Amsterdam"), type) %>%
+  summarise(
+    daily_total = sum(value)
+  ) %>%
+  group_by(type) %>%
+  summarise(
+    total = sum(daily_total),
+    minimum = min(daily_total),
+    mean = mean(daily_total),
+    median = median(daily_total),
+    maximum = max(daily_total)
+  ) %>% 
+  knitr::kable(digits = 2, caption = "Summary of activity data")
+```
+
+#### Weekly-level
+```{r}
+act_tidy %>% 
+  filter(!is.na(act_tidy$datetime)) %>%
+  group_by(week, type) %>%
+  summarise(
+    weekly_total = sum(value)
+  ) %>%
+  group_by(type) %>%
+  summarise(
+    total = sum(weekly_total),
+    minimum = min(weekly_total),
+    mean = mean(weekly_total),
+    median = median(weekly_total),
+    maximum = max(weekly_total)
+  ) %>% 
+  knitr::kable(digits = 2, caption = "Summary of activity data")
+```
+
+### Intensity
+
+### Metabolism 
 
 ## Heart-Rate
 \*describe heart-rate data here\*
@@ -49,6 +127,9 @@ hr_intraday %>%
 
 ## Weight
 \*describe weight data here\*
+```{r}
+head(weight)
+```
 
 # How does getting fitter reflect in the data?  
 \*obviously do a solid attempt to answer this question here\*  
@@ -77,7 +158,6 @@ hr_intraday %>%
   ggplot(aes(x = week, y = value)) +
   geom_point() +
   geom_line() +
-  geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~ type, nrow = 2, ncol = 2, scales = "free_y")
 ```
 
