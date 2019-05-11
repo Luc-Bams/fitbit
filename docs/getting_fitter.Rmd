@@ -26,7 +26,11 @@ source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 \*describe how the data were collected, stored, and what they look like\*
 
 ## Activity
-\*describe activity data here\*
+What I choose to describe here as activity data are all the time-series data returned by the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod) method. For this explanatory section, I'll subdivide these 11 types of activity data in the following three groups:  
++ _Basics_:  
++ _Intensity_:  
++ _Metabolism_:  
+
 
 ### Basics
 ```{r}
