@@ -44,3 +44,6 @@ packrat/lib*/
 
 # No need for a README.html
 README.html
+
+# Make sure my data is not uploaded to the repository
+data/
