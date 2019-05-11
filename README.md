@@ -1,5 +1,5 @@
 # My fitbit data
-This repository contains my own fitbit data, scripts to collect that data from the fitbit API, and a notebook containing my analysis of this data.
+This repository contains scripts to collect data from the fitbit API and a notebook containing my analysis of this data.
 
 ## Objectives
 * Find out how my feeling of getting fitter over time reflects in the data. [<span style="font-variant:small-caps;">notebook</span>](https://luc-bams.github.io/fitbit/getting_fitter.html)
