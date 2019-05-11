@@ -71,20 +71,20 @@ require(lubridate)
 ##----- end:   INITIAL COLLECTION ---------------------------------------------------------------------------------------------------------------------------------------##
 
 ##----- start: SUBSEQUENT COLLECTION ------------------------------------------------------------------------------------------------------------------------------------##
-act_data <- list(calories = read_csv("data/act_calories.csv", col_types = "?dii", locale = locale(tz = "Europe/Amsterdam")),
-                 distance = read_csv("data/act_distance.csv", col_types = "?d", locale = locale(tz = "Europe/Amsterdam")),
-                 elevation = read_csv("data/act_elevation.csv", col_types = "?d", locale = locale(tz = "Europe/Amsterdam")),
-                 floors = read_csv("data/act_floors.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 steps = read_csv("data/act_steps.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 minutesVeryActive = read_csv("data/act_minutesVeryActive.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 minutesLightlyActive = read_csv("data/act_minutesLightlyActive.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 minutesFairlyActive = read_csv("data/act_minutesFairlyActive.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 minutesSedentary = read_csv("data/act_minutesSedentary.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 caloriesBMR = read_csv("data/act_caloriesBMR.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")),
-                 activityCalories = read_csv("data/act_activityCalories.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam")))
-hr_summary <- read_csv("data/hr_summary.csv", col_types = "?ifiiii", locale = locale(tz = "Europe/Amsterdam"))
-hr_intraday <- read_csv("data/hr_intraday.csv", col_types = "?i", locale = locale(tz = "Europe/Amsterdam"))
-weight <- read_csv("data/weight.csv", col_types = "?ddd", locale = locale(tz = "Europe/Amsterdam"))
+act_data <- list(calories = read_csv("data/act_calories.csv", col_types = "?dii", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 distance = read_csv("data/act_distance.csv", col_types = "?d", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 elevation = read_csv("data/act_elevation.csv", col_types = "?d", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 floors = read_csv("data/act_floors.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 steps = read_csv("data/act_steps.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 minutesVeryActive = read_csv("data/act_minutesVeryActive.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 minutesLightlyActive = read_csv("data/act_minutesLightlyActive.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 minutesFairlyActive = read_csv("data/act_minutesFairlyActive.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 minutesSedentary = read_csv("data/act_minutesSedentary.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 caloriesBMR = read_csv("data/act_caloriesBMR.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")),
+                 activityCalories = read_csv("data/act_activityCalories.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam")))
+hr_summary <- read_csv("data/hr_summary.csv", col_types = "?ifiiii", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam"))
+hr_intraday <- read_csv("data/hr_intraday.csv", col_types = "?i", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam"))
+weight <- read_csv("data/weight.csv", col_types = "?ddd", locale = locale(date_names = date_names_lang("en"), tz = "Europe/Amsterdam"))
 
 act_days <- list(calories = as.character(seq(as.Date(as.character(max(act_data[["calories"]]$datetime, na.rm = TRUE))) + 1, as.Date(Sys.Date()), "days")),
                  distance = as.character(seq(as.Date(as.character(max(act_data[["distance"]]$datetime, na.rm = TRUE))) + 1, as.Date(Sys.Date()), "days")),
