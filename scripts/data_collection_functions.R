@@ -254,6 +254,18 @@ get_daily_activity_summary_raw <- function(date = NULL,
       add_headers(Authorization = paste0("Bearer ", token)))
 }
 
+get_activity_log_raw <- function(afterDate = NULL,
+                                 limit = 100,
+                                 offset = 0,
+                                 sort = "desc",
+                                 token = Sys.getenv("FITB_AUTH")) {
+  GET(url = paste0("https://api.fitbit.com/1/user/-/activities/list.json?afterDate=", afterDate, 
+                   "&limit=", limit, 
+                   "&offset=", offset, 
+                   "&sort=", sort),
+      add_headers(Authorization = paste0("Bearer ", token)))
+}
+
 get_lifetime_stats_raw <- function(token = Sys.getenv("FITB_AUTH")) {
   GET(url = paste0("https://api.fitbit.com/1/user/-/activities.json"),
       add_headers(Authorization = paste0("Bearer ", token)))
