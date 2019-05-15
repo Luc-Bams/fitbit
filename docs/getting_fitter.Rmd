@@ -108,6 +108,19 @@ act_tidy %>%
   knitr::kable(digits = 2, caption = "Summary of activity data")
 ```
 
+```{r}
+act_tidy %>% 
+  filter(!is.na(act_tidy$datetime)) %>%
+  group_by(week, type) %>%
+  summarise(
+    weekly_total = sum(value)
+  ) %>%
+  ggplot(aes(x = week, y = weekly_total)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ type, nrow = 2, ncol = 3, scales = "free_y")
+```
+
 ### Intensity
 
 ### Metabolism 
