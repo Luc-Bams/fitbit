@@ -52,10 +52,8 @@ I'm fascinated by the all the cool things you can do with data, but I never real
         - activity calories
         - base metabolic heartrate calories
         - rest heartrate
-        - max heartrate
-        - min heartrate
         - minutes
-        - calories out
+        - calories out (per heartrate zone --> separate table)
 
 ## Activity
 What I choose to describe here as activity data are all the time-series data returned by the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod) method. For this explanatory section, I'll subdivide these 11 types of activity data in the following three groups:  
