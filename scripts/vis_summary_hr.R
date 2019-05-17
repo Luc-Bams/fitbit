@@ -82,4 +82,22 @@ hr_intraday %>%
 #   ggplot(aes(fill = zone, y = minutes, x = date)) + 
 #   geom_bar(stat = "identity")
 ##----- end:   SINGLE DAY OF HEART RATE DATA ----------------------------------------------------------------------------------------------------------------------------##
+
+# Library
+library(dygraphs)
+library(xts)          # To make the convertion data-frame / xts format
+library(tidyverse)
+library(lubridate)
+
+temp <- hr_intraday %>%
+  filter(as.Date(datetime, tz = "Europe/Amsterdam") > (today() - 2))
+
+# Then you can create the xts format, and thus use dygraph
+don = xts(x = temp$hr, order.by = temp$datetime, tzone = "Europe/Amsterdam")
+dygraph(don) %>%
+  dyOptions(labelsUTC = FALSE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = FALSE, colors="#D8AE5A") %>%
+  dyRangeSelector() %>%
+  dyCrosshair(direction = "vertical") %>%
+  dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE)  %>%
+  dyRoller(rollPeriod = 1)
 ##### end:   PLOTS ########################################################################################################################################################
