@@ -50,7 +50,8 @@ hr_intraday %>%
   summarize(hr = round(mean(hr))) %>%
   ungroup() %>%
   mutate(datetime = as.POSIXct(datetime, tz = "Europe/Amsterdam")) %>%
-  ggplot(aes(x = datetime, y = hr)) +
+  ggplot(aes(x = datetime, y = hr, color = hr)) +
+  scale_color_gradientn(colours = c("green", "yellow", "red")) +
   geom_line()
 
 # hr_intraday %>%
@@ -88,6 +89,7 @@ library(dygraphs)
 library(xts)          # To make the convertion data-frame / xts format
 library(tidyverse)
 library(lubridate)
+library(RColorBrewer)
 
 temp <- hr_intraday %>%
   filter(as.Date(datetime, tz = "Europe/Amsterdam") > (today() - 2))
