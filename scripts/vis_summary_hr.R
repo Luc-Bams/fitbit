@@ -44,12 +44,14 @@ hr_summary %>%
 ##----- end:   RESTING HEART RATE ---------------------------------------------------------------------------------------------------------------------------------------##
 
 ##----- start: SINGLE DAY OF HEART RATE DATA ----------------------------------------------------------------------------------------------------------------------------##
-# hr_intraday %>%
-#   filter(as.Date(as.character(datetime)) == (Sys.Date() - 11)) %>%
-#   group_by(datetime = cut(datetime, breaks = "5 min")) %>%
-#   summarize(avg_hr = round(mean(hr))) %>%
-#   ggplot(aes(x = datetime, y = avg_hr)) +
-#   geom_line()
+hr_intraday %>% 
+  filter(as.Date(datetime, tz = "Europe/Amsterdam") > (today() - 2)) %>%
+  group_by(datetime = cut(datetime, breaks = "1 min")) %>%
+  summarize(hr = round(mean(hr))) %>%
+  ungroup() %>%
+  mutate(datetime = as.POSIXct(datetime, tz = "Europe/Amsterdam")) %>%
+  ggplot(aes(x = datetime, y = hr)) +
+  geom_line()
 
 # hr_intraday %>%
 #   filter(as.Date(as.character(datetime)) == as.Date("2019-04-11")) %>%
