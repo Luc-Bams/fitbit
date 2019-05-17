@@ -14,7 +14,7 @@ output:
     highlight: espresso
     number_sections: true
 ---
-```{r include = FALSE}
+```{r, data_collection, include = FALSE}
 # Make sure the most recent data is loaded
 source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 ```
@@ -30,7 +30,32 @@ I'm fascinated by the all the cool things you can do with data, but I never real
 \*make sure to come up with better titles for everything\*  
 
 # Data
-\*describe how the data were collected, stored, and what they look like\*
+\*describe how the data were collected, stored, and what they look like\*  
+\*Create tidy tables here per variable type (i.e. continuous, integer, categorical). Condense heart rate to 1 data point per minute.\*  
+
+* Minute-level
+    + Continuous
+        - calories
+        - distance
+        - elevation
+    + Integer
+        - floors
+        - heartrate
+        - steps
+    + Categorical
+        - activity intensity
+* Daily-level
+    + Continuous
+        - weight
+        - BMI
+    + Integer
+        - activity calories
+        - base metabolic heartrate calories
+        - rest heartrate
+        - max heartrate
+        - min heartrate
+        - minutes
+        - calories out
 
 ## Activity
 What I choose to describe here as activity data are all the time-series data returned by the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod) method. For this explanatory section, I'll subdivide these 11 types of activity data in the following three groups:  
@@ -174,7 +199,7 @@ hr_summary %>%
        caption = "*this is how you make a caption, Luc*")
 ```
 
-```{r}
+```{r, weekly_heart_rate_summary_stats_plot, fig.cap = "weekly_heart_rate_summary_stats_plot"}
 hr_intraday %>%  
   group_by(week) %>%
   summarise(
@@ -192,7 +217,7 @@ hr_intraday %>%
 
 ## Weekly heart-rate distribution  
 \*show ggridges weekly heart rate distributions here\* 
-```{r}
+```{r, weekly_heart_rate_distribution_density_plot, fig.cap = "weekly_heart_rate_distribution_density_plot"}
 hr_intraday %>%
   mutate(week = fct_rev(as.factor(week))) %>%
   ggplot(aes(x= hr, y = week)) +
@@ -203,3 +228,9 @@ hr_intraday %>%
 
 ## Link steps/minute to bpm  
 \*idea here is that when fitter heart rate is lower for a fixed amount of steps/min than when less fit\*  
+
+# Useful Resources
+
+* [Fitbit Web API Basics](https://dev.fitbit.com/build/reference/web-api/basics/)
+* [Fitbit Web API Swagger UI](https://dev.fitbit.com/build/reference/web-api/explore/#/)
+* [Strava Web API Swagger UI](https://developers.strava.com/playground/#/)
