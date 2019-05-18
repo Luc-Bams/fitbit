@@ -119,7 +119,7 @@ for(activity in c("calories", "distance", "elevation", "floors", "steps", "minut
   }
   
   act_data[[activity]] <- act_data[[activity]] %>%
-      mutate(day = wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
+      mutate(day = lubridate::wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
              week = week(datetime))
 }
 
@@ -144,11 +144,11 @@ if(length(hr_days) > 1) {
 }
 
 hr_summary <- hr_summary %>%
-  mutate(day = wday(date, label = TRUE, locale = "English_United States", abbr = FALSE),
+  mutate(day = lubridate::wday(date, label = TRUE, locale = "English_United States", abbr = FALSE),
          week = week(date))
 
 hr_intraday <- hr_intraday %>%
-  mutate(day = wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
+  mutate(day = lubridate::wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
          week = week(datetime))
 
 remove(hr_days, day)
@@ -172,7 +172,7 @@ if(length(weight_days) > 1) {
 }
 
 weight <- weight %>%
-  mutate(day = wday(date, label = TRUE, locale = "English_United States", abbr = FALSE),
+  mutate(day = lubridate::wday(date, label = TRUE, locale = "English_United States", abbr = FALSE),
          week = week(date))
 
 remove(weight_days, day)
