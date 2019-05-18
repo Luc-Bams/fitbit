@@ -14,7 +14,7 @@ output:
     highlight: espresso
     number_sections: true
 ---
-```{r, data_collection, include = FALSE}
+```{r, data_collection_and_preparation, include = FALSE}
 library(data.table)
 library(ggridges)
 library(scales)
@@ -24,6 +24,7 @@ source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 ```
 
 \*insert introductory section here\*  
+This document is the product of a combination of events in my life and some newly-fueled interest that I've had for a longer time.
 
   * Something about my interest in data:  
   
@@ -33,9 +34,9 @@ source('~/R/Projects/fitbit/scripts/data_collection.R', encoding = 'UTF-8')
 I'm fascinated by the all the cool things you can do with data, but I never really took the time to do something like it myself.   
 \*make sure to come up with better titles for everything\*  
 
-# Data
+# Fitbit Time-Series Data
 \*describe how the data were collected, stored, and what they look like\*  
-\*Create tidy tables here per variable type (i.e. continuous, integer, categorical). Condense heart rate to 1 data point per minute.\*  
+All the data that I'm using can be retrieved by calling the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod), [getHeartByDateIntraday](https://dev.fitbit.com/build/reference/web-api/explore/#/Heart_Rate_Intraday_Time_Series/getHeartByDateIntraday), and [getWeightByDate](https://dev.fitbit.com/build/reference/web-api/explore/#/Body_and_Weight/getWeightByDate) methods. 
 
 * Minute-level
     + Continuous
@@ -58,270 +59,106 @@ I'm fascinated by the all the cool things you can do with data, but I never real
         - rest heartrate
         - minutes (per heartrate zone --> separate table) [backlog]
         - calories out (per heartrate zone --> separate table) [backlog]
-        
-```{r, data_preparation, include = FALSE}
-# Minute-level --> continuous: calories, distance, elevation
-data <- list()
-for(type in c("calories", "distance", "elevation")) {
-  data[[type]] <- act_data[[type]] %>% 
-    select_(.dots = list("datetime", type, "day", "week")) %>%
-    mutate(type = type) %>%
-    rename(value = !!type) %>%
-    select(datetime, type, value, day, week)
-  data[[type]]$value <- as.double(data[[type]]$value)
-}
 
-ml_cont <- rbind(data$calories, data$distance, data$elevation)
-ml_cont$type <- factor(ml_cont$type, levels=c("calories", "distance", "elevation"), ordered = FALSE)
-ml_cont$value <- ifelse(ml_cont$type == "distance", 1000*ml_cont$value, ml_cont$value)  # From kilometers to meters
-ml_cont$day <- factor(ml_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+## Minute-Level Data
 
-ml_cont <- ml_cont[order(ml_cont$datetime, ml_cont$type),]
-remove(data)
-
-# Minute-level --> integer: floors, heartrate, steps
-data <- list()
-for(type in c("floors", "steps")) {
-  data[[type]] <- act_data[[type]] %>% 
-    select_(.dots = list("datetime", type, "day", "week")) %>%
-    mutate(type = type) %>%
-    rename(value = !!type) %>%
-    select(datetime, type, value, day, week)
-  data[[type]]$value <- as.integer(data[[type]]$value)
-}
-
-data$heartrate <- hr_intraday %>%
-  group_by(datetime = cut(datetime, breaks = "1 min")) %>%
-  summarize(value = round(mean(hr))) %>%
-  ungroup() %>%
-  mutate(datetime = as.POSIXct(datetime, tz = "Europe/Amsterdam"),
-         type = "heartrate",
-         day = wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
-         week = week(datetime))
-
-ml_int <- rbind(data$floors, data$heartrate, data$steps)
-ml_int$type <- factor(ml_int$type, levels=c("floors", "heartrate", "steps"), ordered = FALSE)
-ml_int$value <- as.integer(ml_int$value)
-ml_int$day <- factor(ml_int$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
-
-ml_int <- ml_int[order(ml_int$datetime, ml_int$type),]
-remove(data)
-
-# Minute-level --> categorical: activity intensity
-ml_cat <- tibble(datetime = act_data$minutesSedentary$datetime,
-                     type = "intensity",
-                     sedentary = act_data$minutesSedentary$sedentary,
-                     light = act_data$minutesLightlyActive$lightlyActive,
-                     fair = act_data$minutesFairlyActive$fairlyActive,
-                     high = act_data$minutesVeryActive$veryActive)
-
-ml_cat$type <- factor(ml_cat$type, ordered = FALSE)                     
-ml_cat$value <- names(ml_cat[-c(1, 2)])[apply(ml_cat[-c(1, 2)] == 1, 1, which)]
-ml_cat <- ml_cat %>% 
-  mutate(day = wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
-         week = week(datetime)) %>%
-  select(datetime, type, value, day, week)
-ml_cat$value <- factor(ml_cat$value, levels=c("sedentary", "light", "fair", "high"), ordered = TRUE)
-ml_cat$day <- factor(ml_cat$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
-
-ml_cat <- ml_cat[order(ml_cat$datetime, ml_cat$type),]
-
-# Daily-level --> continuous: weight, BMI
-dl_cont <- weight %>%
-  gather(key = "type", value = "value", weight, bmi) %>%
-  select(date, type, value, day, week)
-
-dl_cont$type <- factor(dl_cont$type, ordered = FALSE)
-dl_cont$day <- factor(dl_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
-dl_cont <- dl_cont[order(dl_cont$date, dl_cont$type),]
-
-# Daily-level --> integer: activity calories, bmr calories, rest heartrate
-data <- list()
-for(type in c("caloriesBMR", "activityCalories")) {
-  data[[type]] <- act_data[[type]] %>% 
-    select_(.dots = list("datetime", type, "day", "week")) %>%
-    mutate(type = type) %>%
-    rename(value = !!type) %>%
-    select(datetime, type, value, day, week)
-  data[[type]]$value <- as.double(data[[type]]$value)
-}
-
-data$activityCalories$date <- as.Date(data$activityCalories$datetime, tz = "Europe/Amsterdam")
-data$caloriesBMR$date <- as.Date(data$caloriesBMR$datetime, tz = "Europe/Amsterdam")
-
-data$activityCalories$datetime <- NULL
-data$caloriesBMR$datetime <- NULL
-
-data$restheartrate <- hr_summary %>%
-  filter(zone == "Out of Range") %>%
-  mutate(date = as.Date(date, tz = "Europe/Amsterdam"),
-         type = "restHeartrate",
-         value = rest_hr) %>%
-  select(date, type, value, day, week)
-
-dl_int <- rbind(data$caloriesBMR, data$activityCalories, data$restheartrate)
-dl_int$type <- factor(dl_int$type, ordered = FALSE)
-dl_int$day <- factor(dl_int$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
-dl_int <- dl_int[order(dl_int$date, dl_int$type),]
-
-dl_int <- dl_int %>%
-  select(date, type, value, day, week)
-
-remove(data)
-
-# Remove non-tidy data-frames
-remove(act_data)
-remove(hr_intraday)
-remove(hr_summary)
-remove(type)
-remove(weight)
-```
-
-## Activity
-What I choose to describe here as activity data are all the time-series data returned by the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod) method. For this explanatory section, I'll subdivide these 11 types of activity data in the following three groups:  
-
-* _Basics_:  
-* _Intensity_:  
-* _Metabolism_:  
-
-
-### Basics
+### Descriptive Statistics
 ```{r}
-head(act_data$steps)
-```
-
-
-#### Minute-level
-```{r}
-act_tidy %>% 
-  filter(!is.na(act_tidy$datetime)) %>%
+fitbit_data$ml_cont %>%
   group_by(type) %>%
   summarise(
-    total = sum(value),
-    minimum = min(value),
-    mean = mean(value),
-    median = median(value),
-    maximum = max(value)
-  ) %>% 
-  knitr::kable(digits = 2, caption = "Summary of activity data")
-```
-
-#### Daily-level
-```{r}
-act_tidy %>% 
-  filter(!is.na(act_tidy$datetime)) %>%
-  group_by(as.Date(datetime, tz = "Europe/Amsterdam"), type) %>%
-  summarise(
-    daily_total = sum(value)
+  total = sum(value),
+  minimum = min(value),
+  mean = mean(value),
+  median = median(value),
+  maximum = max(value)
   ) %>%
+  knitr::kable(digits = 2, caption = "Summary of activity data")
+
+fitbit_data$ml_int %>%
   group_by(type) %>%
   summarise(
-    total = sum(daily_total),
-    minimum = min(daily_total),
-    mean = mean(daily_total),
-    median = median(daily_total),
-    maximum = max(daily_total)
-  ) %>% 
+  total = sum(value),
+  minimum = min(value),
+  mean = mean(value),
+  median = median(value),
+  maximum = max(value)
+  ) %>%
   knitr::kable(digits = 2, caption = "Summary of activity data")
+```
+
+## Daily-Level Data
+```{r}
+# act_tidy %>% 
+#   filter(!is.na(act_tidy$datetime)) %>%
+#   group_by(as.Date(datetime, tz = "Europe/Amsterdam"), type) %>%
+#   summarise(
+#     daily_total = sum(value)
+#   ) %>%
+#   group_by(type) %>%
+#   summarise(
+#     total = sum(daily_total),
+#     minimum = min(daily_total),
+#     mean = mean(daily_total),
+#     median = median(daily_total),
+#     maximum = max(daily_total)
+#   ) %>% 
+#   knitr::kable(digits = 2, caption = "Summary of activity data")
 ```
 
 #### Weekly-level
-```{r}
-act_tidy %>% 
-  filter(!is.na(act_tidy$datetime)) %>%
-  group_by(week, type) %>%
-  summarise(
-    weekly_total = sum(value)
-  ) %>%
-  group_by(type) %>%
-  summarise(
-    total = sum(weekly_total),
-    minimum = min(weekly_total),
-    mean = mean(weekly_total),
-    median = median(weekly_total),
-    maximum = max(weekly_total)
-  ) %>% 
-  knitr::kable(digits = 2, caption = "Summary of activity data")
-```
 
 ```{r}
-act_tidy %>% 
-  filter(!is.na(act_tidy$datetime)) %>%
-  group_by(week, type) %>%
-  summarise(
-    average_day = sum(value)/uniqueN(day)
-  ) %>%
-  ggplot(aes(x = week, y = average_day)) +
-  geom_point() +
-  geom_line() +
-  facet_wrap(~ type, nrow = 2, ncol = 3, scales = "free_y")
-```
-
-### Intensity
-
-### Metabolism 
-
-## Heart-Rate
-\*describe heart-rate data here\*
-```{r}
-head(hr_intraday)
-```
-
-```{r}
-hr_intraday %>%  
-  summarise(
-    minimum = min(hr),
-    mean = mean(hr),
-    median = median(hr),
-    maximum = max(hr)
-  ) %>% 
-  knitr::kable(digits = 2, caption = "Summary of heart-rate data")
-```
-
-## Weight
-\*describe weight data here\*
-```{r}
-head(weight)
+# act_tidy %>% 
+#   filter(!is.na(act_tidy$datetime)) %>%
+#   group_by(week, type) %>%
+#   summarise(
+#     average_day = sum(value)/uniqueN(day)
+#   ) %>%
+#   ggplot(aes(x = week, y = average_day)) +
+#   geom_point() +
+#   geom_line() +
+#   facet_wrap(~ type, nrow = 2, ncol = 3, scales = "free_y")
 ```
 
 # How does getting fitter reflect in the data?  
 \*obviously do a solid attempt to answer this question here\*  
 
-## Rest Heart Rate
+## Rest Heart Rate Over Time
 ```{r message=FALSE}
-hr_summary %>%
-  ggplot(aes(x = date, y = rest_hr)) +
-  geom_point() +
-  geom_smooth(se = FALSE, span = 0.275) +
-  labs(title = "Rest Heart Rate over Time",
-       subtitle = "*this is how you make a subtitle, Luc*")
+# hr_summary %>%
+#   ggplot(aes(x = date, y = rest_hr)) +
+#   geom_point() +
+#   geom_smooth(se = FALSE, span = 0.275) +
+#   labs(title = "Rest Heart Rate over Time",
+#        subtitle = "*this is how you make a subtitle, Luc*")
 ```
 
 ```{r, weekly_heart_rate_summary_stats_plot, fig.cap = "weekly_heart_rate_summary_stats_plot"}
-hr_intraday %>%  
-  group_by(week) %>%
-  summarise(
-    minimum = min(hr),
-    mean = mean(hr),
-    median = median(hr),
-    maximum = max(hr)
-  ) %>% 
-  gather(key = "type", value = "value", -week) %>%
-  ggplot(aes(x = week, y = value)) +
-  geom_point() +
-  geom_line() +
-  facet_wrap(~ type, nrow = 2, ncol = 2, scales = "free_y")
+# hr_intraday %>%  
+#   group_by(week) %>%
+#   summarise(
+#     minimum = min(hr),
+#     mean = mean(hr),
+#     median = median(hr),
+#     maximum = max(hr)
+#   ) %>% 
+#   gather(key = "type", value = "value", -week) %>%
+#   ggplot(aes(x = week, y = value)) +
+#   geom_point() +
+#   geom_line() +
+#   facet_wrap(~ type, nrow = 2, ncol = 2, scales = "free_y")
 ```
 
 ## Weekly heart-rate distribution  
 \*show ggridges weekly heart rate distributions here\* 
 ```{r, weekly_heart_rate_distribution_density_plot, fig.cap = "weekly_heart_rate_distribution_density_plot"}
-hr_intraday %>%
-  mutate(week = fct_rev(as.factor(week))) %>%
-  ggplot(aes(x= hr, y = week)) +
-  geom_density_ridges(scale = 2.5, alpha = 0.7) +
-  xlim(30, 194) +
-  theme_ridges()
+# hr_intraday %>%
+#   mutate(week = fct_rev(as.factor(week))) %>%
+#   ggplot(aes(x= hr, y = week)) +
+#   geom_density_ridges(scale = 2.5, alpha = 0.7) +
+#   xlim(30, 194) +
+#   theme_ridges()
 ```
 
 ## Link steps/minute to bpm  
