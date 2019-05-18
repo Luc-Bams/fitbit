@@ -63,6 +63,26 @@ All the data that I'm using can be retrieved by calling the fitbit API through t
 ## Minute-Level Data
 
 ### Descriptive Statistics
+```{r, ds_histogram_heartrate, fig.cap = "ds_histogram_heartrate"}
+min_hr <- fitbit_data$ml_int %>%
+  filter(type == "heartrate") %>%
+  select(value) %>%
+  min()
+
+max_hr <- fitbit_data$ml_int %>%
+  filter(type == "heartrate") %>%
+  select(value) %>%
+  max()
+
+fitbit_data$ml_int %>%
+  filter(type == "heartrate") %>%
+  ggplot(aes(x = value, fill = value)) +
+  geom_histogram(binwidth = 1, color = "black", fill = "#9F2042") +
+  theme_classic() +
+  labs(x = "Heart rate", y = "Frequency") +
+  scale_x_continuous(breaks = c(min_hr, 50, 75, 100, 125, 150, 175, max_hr))
+```
+
 ```{r, ds_boxplot_heartrate, fig.cap = "ds_boxplot_heartrate"}
 freq_total <- fitbit_data$ml_int %>%
   filter(type == "heartrate") %>%
