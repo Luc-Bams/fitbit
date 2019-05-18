@@ -102,4 +102,14 @@ dygraph(don) %>%
   dyCrosshair(direction = "vertical") %>%
   dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE)  %>%
   dyRoller(rollPeriod = 1)
+
+# Trying to do some cool stuff with spline(). Not sure whether I would actually want to show heart rate data like this.
+temp <- ml_int %>% 
+  filter(as.character(as.Date(datetime, tz = "Europe/Amsterdam")) == "2019-05-16") %>% 
+  filter(type == "heartrate")
+
+spline_int <- as.data.frame(spline(temp$datetime, temp$value))
+temp %>% 
+  ggplot(aes(x = datetime, y = value)) + geom_point() + 
+  geom_line(data = spline_int, aes(x = as.POSIXct(x, tz = "Europe/Amsterdam", origin = "1970-01-01 00:00:02"), y = y))
 ##### end:   PLOTS ########################################################################################################################################################

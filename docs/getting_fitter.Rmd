@@ -59,7 +59,7 @@ I'm fascinated by the all the cool things you can do with data, but I never real
         - minutes (per heartrate zone --> separate table)
         - calories out (per heartrate zone --> separate table)
         
-```{r include = FALSE}
+```{r, data_preparation, include = FALSE}
 # Minute-level --> continuous: calories, distance, elevation
 data <- list()
 for(type in c("calories", "distance", "elevation")) {
@@ -244,8 +244,7 @@ hr_summary %>%
   geom_point() +
   geom_smooth(se = FALSE, span = 0.275) +
   labs(title = "Rest Heart Rate over Time",
-       subtitle = "*this is how you make a subtitle, Luc*",
-       caption = "*this is how you make a caption, Luc*")
+       subtitle = "*this is how you make a subtitle, Luc*")
 ```
 
 ```{r, weekly_heart_rate_summary_stats_plot, fig.cap = "weekly_heart_rate_summary_stats_plot"}
