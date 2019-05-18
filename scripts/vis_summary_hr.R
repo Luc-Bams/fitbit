@@ -112,4 +112,5 @@ spline_int <- as.data.frame(spline(temp$datetime, temp$value))
 temp %>% 
   ggplot(aes(x = datetime, y = value)) + geom_point() + 
   geom_line(data = spline_int, aes(x = as.POSIXct(x, tz = "Europe/Amsterdam", origin = "1970-01-01 00:00:02"), y = y))
+remove(spline_int)
 ##### end:   PLOTS ########################################################################################################################################################
