@@ -56,8 +56,8 @@ I'm fascinated by the all the cool things you can do with data, but I never real
         - activity calories
         - base metabolic heartrate calories
         - rest heartrate
-        - minutes (per heartrate zone --> separate table)
-        - calories out (per heartrate zone --> separate table)
+        - minutes (per heartrate zone --> separate table) [backlog]
+        - calories out (per heartrate zone --> separate table) [backlog]
         
 ```{r, data_preparation, include = FALSE}
 # Minute-level --> continuous: calories, distance, elevation
@@ -125,6 +125,56 @@ ml_cat$value <- factor(ml_cat$value, levels=c("sedentary", "light", "fair", "hig
 ml_cat$day <- factor(ml_cat$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
 
 ml_cat <- ml_cat[order(ml_cat$datetime, ml_cat$type),]
+
+# Daily-level --> continuous: weight, BMI
+dl_cont <- weight %>%
+  gather(key = "type", value = "value", weight, bmi) %>%
+  select(date, type, value, day, week)
+
+dl_cont$type <- factor(dl_cont$type, ordered = FALSE)
+dl_cont$day <- factor(dl_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+dl_cont <- dl_cont[order(dl_cont$date, dl_cont$type),]
+
+# Daily-level --> integer: activity calories, bmr calories, rest heartrate
+data <- list()
+for(type in c("caloriesBMR", "activityCalories")) {
+  data[[type]] <- act_data[[type]] %>% 
+    select_(.dots = list("datetime", type, "day", "week")) %>%
+    mutate(type = type) %>%
+    rename(value = !!type) %>%
+    select(datetime, type, value, day, week)
+  data[[type]]$value <- as.double(data[[type]]$value)
+}
+
+data$activityCalories$date <- as.Date(data$activityCalories$datetime, tz = "Europe/Amsterdam")
+data$caloriesBMR$date <- as.Date(data$caloriesBMR$datetime, tz = "Europe/Amsterdam")
+
+data$activityCalories$datetime <- NULL
+data$caloriesBMR$datetime <- NULL
+
+data$restheartrate <- hr_summary %>%
+  filter(zone == "Out of Range") %>%
+  mutate(date = as.Date(date, tz = "Europe/Amsterdam"),
+         type = "restHeartrate",
+         value = rest_hr) %>%
+  select(date, type, value, day, week)
+
+dl_int <- rbind(data$caloriesBMR, data$activityCalories, data$restheartrate)
+dl_int$type <- factor(dl_int$type, ordered = FALSE)
+dl_int$day <- factor(dl_int$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+dl_int <- dl_int[order(dl_int$date, dl_int$type),]
+
+dl_int <- dl_int %>%
+  select(date, type, value, day, week)
+
+remove(data)
+
+# Remove non-tidy data-frames
+remove(act_data)
+remove(hr_intraday)
+remove(hr_summary)
+remove(type)
+remove(weight)
 ```
 
 ## Activity
