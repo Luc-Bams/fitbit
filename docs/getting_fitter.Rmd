@@ -73,6 +73,7 @@ for(type in c("calories", "distance", "elevation")) {
 
 ml_cont <- rbind(data$calories, data$distance, data$elevation)
 ml_cont$type <- factor(ml_cont$type, levels=c("calories", "distance", "elevation"), ordered = FALSE)
+ml_cont$value <- ifelse(ml_cont$type == "distance", 1000*ml_cont$value, ml_cont$value)  # From kilometers to meters
 ml_cont$day <- factor(ml_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
 
 ml_cont <- ml_cont[order(ml_cont$datetime, ml_cont$type),]
