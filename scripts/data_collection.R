@@ -178,3 +178,125 @@ weight <- weight %>%
 remove(weight_days, day)
 ##----- end:   WEIGHT ---------------------------------------------------------------------------------------------------------------------------------------------------##
 ##### end:   COLLECT DATA #################################################################################################################################################
+
+##### start:   TIDY DATA ##################################################################################################################################################
+# Minute-level --> continuous: calories, distance, elevation
+data <- list()
+for(type in c("calories", "distance", "elevation")) {
+  data[[type]] <- act_data[[type]] %>% 
+    select_(.dots = list("datetime", type, "day", "week")) %>%
+    mutate(type = type) %>%
+    rename(value = !!type) %>%
+    select(datetime, type, value, day, week)
+  data[[type]]$value <- as.double(data[[type]]$value)
+}
+
+ml_cont <- rbind(data$calories, data$distance, data$elevation)
+ml_cont$type <- factor(ml_cont$type, levels=c("calories", "distance", "elevation"), ordered = FALSE)
+ml_cont$value <- ifelse(ml_cont$type == "distance", 1000*ml_cont$value, ml_cont$value)  # From kilometers to meters
+ml_cont$day <- factor(ml_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+
+ml_cont <- ml_cont[order(ml_cont$datetime, ml_cont$type),]
+remove(data)
+
+# Minute-level --> integer: floors, heartrate, steps
+data <- list()
+for(type in c("floors", "steps")) {
+  data[[type]] <- act_data[[type]] %>% 
+    select_(.dots = list("datetime", type, "day", "week")) %>%
+    mutate(type = type) %>%
+    rename(value = !!type) %>%
+    select(datetime, type, value, day, week)
+  data[[type]]$value <- as.integer(data[[type]]$value)
+}
+
+data$heartrate <- hr_intraday %>%
+  group_by(datetime = cut(datetime, breaks = "1 min")) %>%
+  summarize(value = round(mean(hr))) %>%
+  ungroup() %>%
+  mutate(datetime = as.POSIXct(datetime, tz = "Europe/Amsterdam"),
+         type = "heartrate",
+         day = lubridate::wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
+         week = week(datetime))
+
+ml_int <- rbind(data$floors, data$heartrate, data$steps)
+ml_int$type <- factor(ml_int$type, levels=c("floors", "heartrate", "steps"), ordered = FALSE)
+ml_int$value <- as.integer(ml_int$value)
+ml_int$day <- factor(ml_int$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+
+ml_int <- ml_int[order(ml_int$datetime, ml_int$type),]
+remove(data)
+
+# Minute-level --> categorical: activity intensity
+ml_cat <- tibble(datetime = act_data$minutesSedentary$datetime,
+                 type = "intensity",
+                 sedentary = act_data$minutesSedentary$sedentary,
+                 light = act_data$minutesLightlyActive$lightlyActive,
+                 fair = act_data$minutesFairlyActive$fairlyActive,
+                 high = act_data$minutesVeryActive$veryActive)
+
+ml_cat$type <- factor(ml_cat$type, ordered = FALSE)                     
+ml_cat$value <- names(ml_cat[-c(1, 2)])[apply(ml_cat[-c(1, 2)] == 1, 1, which)]
+ml_cat <- ml_cat %>% 
+  mutate(day = lubridate::wday(datetime, label = TRUE, locale = "English_United States", abbr = FALSE),
+         week = week(datetime)) %>%
+  select(datetime, type, value, day, week)
+ml_cat$value <- factor(ml_cat$value, levels=c("sedentary", "light", "fair", "high"), ordered = TRUE)
+ml_cat$day <- factor(ml_cat$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+
+ml_cat <- ml_cat[order(ml_cat$datetime, ml_cat$type),]
+
+# Daily-level --> continuous: weight, BMI
+dl_cont <- weight %>%
+  gather(key = "type", value = "value", weight, bmi) %>%
+  select(date, type, value, day, week)
+
+dl_cont$type <- factor(dl_cont$type, ordered = FALSE)
+dl_cont$day <- factor(dl_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+dl_cont <- dl_cont[order(dl_cont$date, dl_cont$type),]
+
+# Daily-level --> integer: activity calories, bmr calories, rest heartrate
+data <- list()
+for(type in c("caloriesBMR", "activityCalories")) {
+  data[[type]] <- act_data[[type]] %>% 
+    select_(.dots = list("datetime", type, "day", "week")) %>%
+    mutate(type = type) %>%
+    rename(value = !!type) %>%
+    select(datetime, type, value, day, week)
+  data[[type]]$value <- as.double(data[[type]]$value)
+}
+
+data$activityCalories$date <- as.Date(data$activityCalories$datetime, tz = "Europe/Amsterdam")
+data$caloriesBMR$date <- as.Date(data$caloriesBMR$datetime, tz = "Europe/Amsterdam")
+
+data$activityCalories$datetime <- NULL
+data$caloriesBMR$datetime <- NULL
+
+data$restheartrate <- hr_summary %>%
+  filter(zone == "Out of Range") %>%
+  mutate(date = as.Date(date, tz = "Europe/Amsterdam"),
+         type = "restHeartrate",
+         value = rest_hr) %>%
+  select(date, type, value, day, week)
+
+dl_int <- rbind(data$caloriesBMR, data$activityCalories, data$restheartrate)
+dl_int$type <- factor(dl_int$type, ordered = FALSE)
+dl_int$day <- factor(dl_int$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+dl_int <- dl_int[order(dl_int$date, dl_int$type),]
+
+dl_int <- dl_int %>%
+  select(date, type, value, day, week)
+
+remove(data)
+
+# Remove non-tidy data-frames
+remove(act_data)
+remove(hr_intraday)
+remove(hr_summary)
+remove(type)
+remove(weight)
+
+# Place all data in a list
+fitbit_data <- list(dl_cont = dl_cont, dl_int = dl_int, ml_cat = ml_cat, ml_cont = ml_cont, ml_int = ml_int)
+remove(dl_cont, dl_int, ml_cat, ml_cont, ml_int)
+##### end:     TIDY DATA ##################################################################################################################################################
