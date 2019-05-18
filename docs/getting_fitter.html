@@ -110,7 +110,8 @@ $(document).ready(function () {
 </div>
 
 <div id="main">
-<p>*insert introductory section here*</p>
+<p>*insert introductory section here*<br />
+This document is the product of a combination of events in my life and some newly-fueled interest that I’ve had for a longer time.</p>
 <ul>
 <li><p>Something about my interest in data:</p>
 <ul>
@@ -124,7 +125,7 @@ $(document).ready(function () {
 <div id="fitbit-time-series-data" class="section level1">
 <h1><span class="header-section-number">1</span> Fitbit Time-Series Data</h1>
 <p>*describe how the data were collected, stored, and what they look like*<br />
-The data that I’m using are all the time-series data returned by the fitbit API through the <a href="https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod">getActivitiesResourceByDatePeriod</a> method.</p>
+All the data that I’m using can be retrieved by calling the fitbit API through the <a href="https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod">getActivitiesResourceByDatePeriod</a>, <a href="https://dev.fitbit.com/build/reference/web-api/explore/#/Heart_Rate_Intraday_Time_Series/getHeartByDateIntraday">getHeartByDateIntraday</a>, and <a href="https://dev.fitbit.com/build/reference/web-api/explore/#/Body_and_Weight/getWeightByDate">getWeightByDate</a> methods. The functions I wrote to perform these GET requests can be found in <a href="https://github.com/Luc-Bams/fitbit/blob/master/scripts/data_collection_functions.R">this script</a>. *How I structured the data and why. –&gt; leads to a reference to the script I used.* The code to collect new data from the fitbit servers and tidy it can be found in <a href="https://github.com/Luc-Bams/fitbit/blob/master/scripts/data_collection.R">this script</a>.</p>
 <ul>
 <li>Minute-level
 <ul>
