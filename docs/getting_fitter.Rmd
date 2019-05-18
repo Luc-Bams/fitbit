@@ -75,6 +75,7 @@ ml_cont <- rbind(data$calories, data$distance, data$elevation)
 ml_cont$type <- factor(ml_cont$type, levels=c("calories", "distance", "elevation"), ordered = FALSE)
 ml_cont$day <- factor(ml_cont$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
 
+ml_cont <- ml_cont[order(ml_cont$datetime, ml_cont$type),]
 remove(data)
 
 # Minute-level --> integer: floors, heartrate, steps
@@ -102,6 +103,7 @@ ml_int$type <- factor(ml_int$type, levels=c("floors", "heartrate", "steps"), ord
 ml_int$value <- as.integer(ml_int$value)
 ml_int$day <- factor(ml_int$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
 
+ml_int <- ml_int[order(ml_int$datetime, ml_int$type),]
 remove(data)
 
 # Minute-level --> categorical: activity intensity
@@ -120,6 +122,8 @@ ml_cat <- ml_cat %>%
   select(datetime, type, value, day, week)
 ml_cat$value <- factor(ml_cat$value, levels=c("sedentary", "light", "fair", "high"), ordered = TRUE)
 ml_cat$day <- factor(ml_cat$day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), ordered = TRUE)
+
+ml_cat <- ml_cat[order(ml_cat$datetime, ml_cat$type),]
 ```
 
 ## Activity
