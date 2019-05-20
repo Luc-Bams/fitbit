@@ -14,6 +14,7 @@ output:
     highlight: espresso
     number_sections: true
 ---
+
 ```{r, data_collection_and_preparation, include = FALSE}
 library(data.table)
 library(ggridges)
@@ -63,7 +64,7 @@ All the data that I'm using can be retrieved by calling the fitbit API through t
 ## Minute-Level Data
 
 ### Descriptive Statistics
-```{r, ds_histogram_heartrate, fig.align = "center", fig.cap = "ds_histogram_heartrate", out.width = "80%"}
+```{r, ds_histogram_heartrate, fig.cap = "ds_histogram_heartrate"}
 min_hr <- fitbit_data$ml_int %>%
   filter(type == "heartrate") %>%
   select(value) %>%
