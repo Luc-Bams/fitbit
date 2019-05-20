@@ -4,16 +4,20 @@ author:
   - name: "Luc Bams"
     email: "luc-bams@hotmail.com"
     url: "https://github.com/Luc-Bams"
-data: "May 9, 2019"
+date: "Last Updated: `r format(Sys.time(), '%Y-%m-%d at %H:%M')`"
 output:
   rmdformats::readthedown:
-    self_contained: true
+    self_contained: false
     thumbnails: true
     lightbox: true
     gallery: false
     highlight: espresso
     number_sections: true
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 ```{r, data_collection_and_preparation, include = FALSE}
 library(data.table)
 library(ggridges)
@@ -63,7 +67,7 @@ All the data that I'm using can be retrieved by calling the fitbit API through t
 ## Minute-Level Data
 
 ### Descriptive Statistics
-```{r, ds_histogram_heartrate, fig.cap = "ds_histogram_heartrate"}
+```{r, ds_histogram_heartrate, fig.align = "center", fig.cap = "ds_histogram_heartrate", out.width = "80%"}
 min_hr <- fitbit_data$ml_int %>%
   filter(type == "heartrate") %>%
   select(value) %>%
@@ -76,10 +80,11 @@ max_hr <- fitbit_data$ml_int %>%
 
 fitbit_data$ml_int %>%
   filter(type == "heartrate") %>%
-  ggplot(aes(x = value, fill = value)) +
-  geom_histogram(binwidth = 1, color = "black", fill = "#9F2042") +
+  ggplot(aes(x = value, fill = value, stat(density))) +
+  geom_histogram(binwidth = 1, color = "black", fill = "#2A211C") +
+  geom_density(alpha = 0.8, color = "black", fill = "#9F2042") +
   theme_classic() +
-  labs(x = "Heart rate", y = "Frequency") +
+  labs(x = "Heart rate", y = "Density") +
   scale_x_continuous(breaks = c(min_hr, 50, 75, 100, 125, 150, 175, max_hr))
 ```
 
