@@ -13,6 +13,7 @@ output:
     gallery: false
     highlight: espresso
     number_sections: true
+    code_folding: "hide"
 ---
 
 ```{r, data_collection_and_preparation, include = FALSE}
@@ -137,8 +138,6 @@ fitbit_data$ml_cont %>%
 #   ) %>% 
 #   knitr::kable(digits = 2, caption = "Summary of activity data")
 ```
-
-#### Weekly-level
 
 ```{r}
 # act_tidy %>% 
