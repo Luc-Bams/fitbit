@@ -48,14 +48,14 @@ I decided to structure the data in a tidy format. The code to collect new data f
 * Daily-level
     + Numerical: weight, BMI, activity calories, base metabolic heartrate calories, rest heartrate{, minutes, calories out (per heartrate zone --> separate table) [backlog]}
 
-Here the structure of the data:
 ```{r, ds_data_structure}
 str(fitbit_data)
 ```
 
 ## Minute-Level Data
 
-### Descriptive Statistics
+### Data Validation
+\*Show summary statistics for all numerical variables and table for ordinal. Show histogram and density plot for heartrate. Other plots are so heavily skewed that they are not very informative other than that they show that the values are 0 most of the time.\*
 ```{r, ds_histogram_and_density_heartrate, fig.cap = "ds_histogram_and_density_heartrate"}
 min_hr <- fitbit_data$ml_num %>%
   filter(type == "heartrate") %>%
