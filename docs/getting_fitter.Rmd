@@ -38,45 +38,36 @@ I'm fascinated by the all the cool things you can do with data, but I never real
 
 # Fitbit Time-Series Data
 \*describe how the data were collected, stored, and what they look like\*  
-All the data that I'm using can be retrieved by calling the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod), [getHeartByDateIntraday](https://dev.fitbit.com/build/reference/web-api/explore/#/Heart_Rate_Intraday_Time_Series/getHeartByDateIntraday), and [getWeightByDate](https://dev.fitbit.com/build/reference/web-api/explore/#/Body_and_Weight/getWeightByDate) methods. The functions I wrote to perform these GET requests can be found in [this script](https://github.com/Luc-Bams/fitbit/blob/master/scripts/data_collection_functions.R). \*How I structured the data and why. --> leads to a reference to the script I used.\* The code to collect new data from the fitbit servers and tidy it can be found in [this script](https://github.com/Luc-Bams/fitbit/blob/master/scripts/data_collection.R).
+All the data that I'm using can be retrieved by calling the fitbit API through the [getActivitiesResourceByDatePeriod](https://dev.fitbit.com/build/reference/web-api/explore/#/Time_Series/getActivitiesResourceByDatePeriod), [getHeartByDateIntraday](https://dev.fitbit.com/build/reference/web-api/explore/#/Heart_Rate_Intraday_Time_Series/getHeartByDateIntraday), and [getWeightByDate](https://dev.fitbit.com/build/reference/web-api/explore/#/Body_and_Weight/getWeightByDate) methods. The functions I wrote to perform these GET requests can be found in [this script](https://github.com/Luc-Bams/fitbit/blob/master/scripts/data_collection_functions.R).  
+
+I decided to structure the data in a tidy format. The code to collect new data from the fitbit servers and tidy it can be found in [this script](https://github.com/Luc-Bams/fitbit/blob/master/scripts/data_collection.R). So first I split up the data in minute-level and daily-level time series. Then I created separate tibbles per type of value:    
 
 * Minute-level
-    + Continuous
-        - calories
-        - distance
-        - elevation
-    + Integer
-        - floors
-        - heartrate
-        - steps
-    + Categorical
-        - activity intensity
+    + Numerical: calories, distance, elevation, floors, heartrate, steps
+    + Ordinal: activity intensity
 * Daily-level
-    + Continuous
-        - weight
-        - BMI
-    + Integer
-        - activity calories
-        - base metabolic heartrate calories
-        - rest heartrate
-        - minutes (per heartrate zone --> separate table) [backlog]
-        - calories out (per heartrate zone --> separate table) [backlog]
+    + Numerical: weight, BMI, activity calories, base metabolic heartrate calories, rest heartrate{, minutes, calories out (per heartrate zone --> separate table) [backlog]}
+
+Here the structure of the data:
+```{r, ds_data_structure}
+str(fitbit_data)
+```
 
 ## Minute-Level Data
 
 ### Descriptive Statistics
-```{r, ds_histogram_heartrate, fig.cap = "ds_histogram_heartrate"}
-min_hr <- fitbit_data$ml_int %>%
+```{r, ds_histogram_and_density_heartrate, fig.cap = "ds_histogram_and_density_heartrate"}
+min_hr <- fitbit_data$ml_num %>%
   filter(type == "heartrate") %>%
   select(value) %>%
   min()
 
-max_hr <- fitbit_data$ml_int %>%
+max_hr <- fitbit_data$ml_num %>%
   filter(type == "heartrate") %>%
   select(value) %>%
   max()
 
-fitbit_data$ml_int %>%
+fitbit_data$ml_num %>%
   filter(type == "heartrate") %>%
   ggplot(aes(x = value, fill = value, stat(density))) +
   geom_histogram(binwidth = 1, color = "black", fill = "#2A211C") +
@@ -87,28 +78,28 @@ fitbit_data$ml_int %>%
 ```
 
 ```{r, ds_boxplot_heartrate, fig.cap = "ds_boxplot_heartrate"}
-freq_total <- fitbit_data$ml_int %>%
-  filter(type == "heartrate") %>%
-  nrow()
-
-fitbit_data$ml_int %>%
-  filter(type == "heartrate") %>% 
-  group_by(value) %>% 
-  mutate(density = n()) %>%
-  ungroup() %>%
-  mutate(density = density/freq_total) %>%
-  ggplot(aes(x = type, y = value, color = density)) +
-  theme_minimal() +
-  scale_color_viridis_c(option = "D") +
-  geom_jitter(alpha = 0.03, height = 0, width = 0.6) +
-  geom_violin(alpha = 0, position = position_dodge(width = .75), size = 1, color = "black") +
-  geom_boxplot(notch = FALSE,  outlier.size = -1, color = "black", lwd = 1, alpha = 0, width = 0.04)
-
-remove(freq_total)
+# freq_total <- fitbit_data$ml_num %>%
+#   filter(type == "heartrate") %>%
+#   nrow()
+# 
+# fitbit_data$ml_num %>%
+#   filter(type == "heartrate") %>% 
+#   group_by(value) %>% 
+#   mutate(density = n()) %>%
+#   ungroup() %>%
+#   mutate(density = density/freq_total) %>%
+#   ggplot(aes(x = type, y = value, color = density)) +
+#   theme_minimal() +
+#   scale_color_viridis_c(option = "D") +
+#   geom_jitter(alpha = 0.03, height = 0, width = 0.6) +
+#   geom_violin(alpha = 0, position = position_dodge(width = .75), size = 1, color = "black") +
+#   geom_boxplot(notch = FALSE,  outlier.size = -1, color = "black", lwd = 1, alpha = 0, width = 0.04)
+# 
+# remove(freq_total)
 ```
 
 ```{r}
-fitbit_data$ml_cont %>%
+fitbit_data$ml_num %>%
   group_by(type) %>%
   summarise(
   total = sum(value),
