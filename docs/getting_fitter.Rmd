@@ -7,13 +7,14 @@ author:
 date: "Last Updated: `r format(Sys.time(), '%Y-%m-%d at %H:%M')`"
 output:
   rmdformats::readthedown:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
+    code_folding: "hide"
     gallery: false
     highlight: espresso
+    lightbox: true
     number_sections: true
-    code_folding: "hide"
+    html_document:
+      self_contained: true
+      thumbnails: true
 ---
 
 ```{r, data_collection_and_preparation, include = FALSE}
@@ -78,7 +79,9 @@ fitbit_data$ml_num %>%
                                                        "*$\\sigma$~X~*"))
 ```
 
-```{r, ds_histogram_and_density_heartrate, fig.cap = "ds_histogram_and_density_heartrate"}
+\*Some text here.\*
+
+```{r, ds_histogram_and_density_heartrate, fig.cap = "ds_histogram_and_density_heartrate", fig.align = "center", out.width = "90%"}
 min_hr <- fitbit_data$ml_num %>%
   filter(type == "heartrate") %>%
   select(value) %>%
@@ -94,12 +97,18 @@ fitbit_data$ml_num %>%
   ggplot(aes(x = value, fill = value, stat(density))) +
   geom_histogram(binwidth = 1, color = "black", fill = "#2A211C") +
   geom_density(alpha = 0.8, color = "black", fill = "#9F2042") +
-  theme_classic() +
+  theme_classic(base_size = 12, base_line_size = 1) +
+  theme(axis.title.x = element_text(color = "#000000", face = "italic", margin = margin(7.5, 0, 0, 0)),
+        axis.title.y = element_text(color = "#000000", face = "italic", margin = margin(0, 7.5, 0, 0)),
+        axis.text.x = element_text(color = "#000000", face = "bold", size = 9),
+        axis.text.y = element_text(color = "#000000", face = "bold", size = 9),
+        panel.background = element_rect(fill = "#FCFCFC"),
+        plot.background = element_rect(color = "#000000", fill = "#FCFCFC")) +
   labs(x = "Heart rate", y = "Density") +
   scale_x_continuous(breaks = c(min_hr, 50, 75, 100, 125, 150, 175, max_hr))
 ```
 
-
+\*Some text here.\*
 
 ## Daily-Level Data
 ```{r}
