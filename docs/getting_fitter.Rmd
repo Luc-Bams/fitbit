@@ -56,6 +56,28 @@ str(fitbit_data)
 
 ### Data Validation
 \*Show summary statistics for all numerical variables and table for ordinal. Show histogram and density plot for heartrate. Other plots are so heavily skewed that they are not very informative other than that they show that the values are 0 most of the time.\*
+```{r, ds_ml_num_summary_statistics, fig.cap = "ds_ml_num_summary_statistics"}
+fitbit_data$ml_num %>%
+  group_by(type) %>%
+  summarise(
+  minimum = min(value),
+  pctl_25 = quantile(value, probs = c(0.25), names = FALSE),
+  median = median(value),
+  pctl_75 = quantile(value, probs = c(0.75), names = FALSE),
+  maximum = max(value),
+  mean = mean(value),
+  st_dev = sd(value)
+  ) %>%
+  knitr::kable(digits = 2, caption = "", col.names = c("", 
+                                                       "*P~0~*",
+                                                       "*P~25~*",
+                                                       "*P~50~*",
+                                                       "*P~75~*",
+                                                       "*P~100~*",
+                                                       "*$\\mu$*",
+                                                       "*$\\sigma$~X~*"))
+```
+
 ```{r, ds_histogram_and_density_heartrate, fig.cap = "ds_histogram_and_density_heartrate"}
 min_hr <- fitbit_data$ml_num %>%
   filter(type == "heartrate") %>%
@@ -77,39 +99,7 @@ fitbit_data$ml_num %>%
   scale_x_continuous(breaks = c(min_hr, 50, 75, 100, 125, 150, 175, max_hr))
 ```
 
-```{r, ds_boxplot_heartrate, fig.cap = "ds_boxplot_heartrate"}
-# freq_total <- fitbit_data$ml_num %>%
-#   filter(type == "heartrate") %>%
-#   nrow()
-# 
-# fitbit_data$ml_num %>%
-#   filter(type == "heartrate") %>% 
-#   group_by(value) %>% 
-#   mutate(density = n()) %>%
-#   ungroup() %>%
-#   mutate(density = density/freq_total) %>%
-#   ggplot(aes(x = type, y = value, color = density)) +
-#   theme_minimal() +
-#   scale_color_viridis_c(option = "D") +
-#   geom_jitter(alpha = 0.03, height = 0, width = 0.6) +
-#   geom_violin(alpha = 0, position = position_dodge(width = .75), size = 1, color = "black") +
-#   geom_boxplot(notch = FALSE,  outlier.size = -1, color = "black", lwd = 1, alpha = 0, width = 0.04)
-# 
-# remove(freq_total)
-```
 
-```{r}
-fitbit_data$ml_num %>%
-  group_by(type) %>%
-  summarise(
-  total = sum(value),
-  minimum = min(value),
-  mean = mean(value),
-  median = median(value),
-  maximum = max(value)
-  ) %>%
-  knitr::kable(digits = 2, caption = "Summary of activity data")
-```
 
 ## Daily-Level Data
 ```{r}
